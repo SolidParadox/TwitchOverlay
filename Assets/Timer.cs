@@ -22,19 +22,27 @@ public class Timer : MonoBehaviour {
 
   public Transform selector;
   public GameObject pausedLed;
+  public GameObject stopwatchLed;
   public Animator selAnim;
 
   private void Start () {
     oldPV = true;
     paused = false;
     pausedLed.SetActive ( false );
+    stopwatchLed.SetActive ( false );
   }
 
   void Update () {
     selAnim.SetBool ( "Transition", false );
+
     if ( Input.GetKeyDown (KeyCode.Space) ) {
       paused = !paused;
       pausedLed.SetActive ( paused );
+    }
+
+    if ( Input.GetKeyDown(KeyCode.E) && paused) {
+      if ( mode == TimerMode.Timer ) mode = TimerMode.Countdown; else mode = TimerMode.Timer;
+      stopwatchLed.SetActive ( mode == TimerMode.Timer );
     }
 
     bool pulse = Mathf.Repeat (time, 1 ) > 0.5f;
@@ -48,7 +56,11 @@ public class Timer : MonoBehaviour {
     selector.position = new Vector3 ( 2.75f, 0, 0 ) * selPos; 
 
     if ( !paused ) {
-      time -= Time.deltaTime;
+      if ( mode == TimerMode.Countdown ) { 
+        time -= Time.deltaTime; 
+      } else {
+        time += Time.deltaTime;
+      }
     } else {
       if ( Input.GetKeyDown ( KeyCode.LeftArrow ) ) {
         selAnim.SetBool ( "Transition", true );
